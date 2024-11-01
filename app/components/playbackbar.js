@@ -43,19 +43,19 @@ const PlaybackBar = () => {
       
       <View style={styles.controlsContainer}>
         <TouchableOpacity onPress={backward} disabled={!isPlaying}>
-          <FontAwesome name="backward" size={24} color="black" />
+          <FontAwesome name="backward" size={24} color="white" />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseButton}>
           <MaterialIcons
             name={isPlaying ? "pause" : "play-arrow"}
             size={30}
-            color="black"
+            color="white"
           />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={forward} disabled={!isPlaying}>
-          <AntDesign name="forward" size={24} color="black" />
+          <AntDesign name="forward" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -67,9 +67,10 @@ const PlaybackBar = () => {
           maximumValue={durationMillis / 1000}
           value={positionMillis / 1000}
           onSlidingComplete={(value) => seek(value * 1000)}
-          minimumTrackTintColor="#333"
+          minimumTrackTintColor="#fff"
           maximumTrackTintColor="#ccc"
-          thumbTintColor="#333"
+          thumbTintColor="#fff"
+
         />
         <Text style={styles.timeText}>{formatTime(durationMillis)}</Text>
       </View>
@@ -90,6 +91,7 @@ const styles = StyleSheet.create({
     bottom: 49,
     left: 0,
     right: 0,
+    backgroundColor: "black",
   },
   titleContainer: {
     width: '100%',
@@ -100,13 +102,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     textAlign: 'center',
-    color: '#333',
+    color: '#fff',
   },
   controlsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    color: '#333',
   },
   playPauseButton: {
     marginHorizontal: 20,
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 12,
-    color: "#666",
+    color: "#fff",
   },
 });
 
