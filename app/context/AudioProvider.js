@@ -16,6 +16,7 @@ class AudioProvider extends Component {
       isLoading: false,
       error: null,
       currentUri: '',
+      currentTitle: '',
       durationMillis: 0,
       positionMillis: 0,
     };
@@ -27,22 +28,21 @@ class AudioProvider extends Component {
     this.setState({ audioFiles: libraryData });
   }
 
-  // componentWillUnmount() {
-  //   this.cleanupAudio();
-  //   clearInterval(this.updateInterval);
-  // }
-
   playSound = async (uri) => {
     if (this.state.isLoading || !uri) return;
 
     try {
+      // Find the audio file with matching URI to get its title
+      const audioFile = this.state.audioFiles.find(file => file.url === uri);
+      const title = audioFile?.title || 'Now Playing';
+
       // If the same sound is requested, just play it
       if (this.state.currentUri === uri) {
         if (this.state.isPlaying) {
           return; // Already playing, so do nothing
         }
         await this.soundRef.playAsync(); // Resume playback
-        this.setState({ isPlaying: true });
+        this.setState({ isPlaying: true, currentTitle: title });
         this.startUpdatingProgress();
         return;
       }
@@ -68,6 +68,7 @@ class AudioProvider extends Component {
         isPlaying: true,
         isLoading: false,
         currentUri: uri,
+        currentTitle: title,
         durationMillis: (await this.soundRef.getStatusAsync()).durationMillis,
       });
 
@@ -81,8 +82,8 @@ class AudioProvider extends Component {
   pauseSound = async () => {
     if (this.state.currentSound && this.state.isPlaying) {
       await this.soundRef.pauseAsync();
-      const status = await this.soundRef.getStatusAsync(); // Get the current position
-      this.setState({ isPlaying: false, positionMillis: status.positionMillis }); // Update positionMillis on pause
+      const status = await this.soundRef.getStatusAsync();
+      this.setState({ isPlaying: false, positionMillis: status.positionMillis });
       clearInterval(this.updateInterval);
     }
   };
@@ -99,27 +100,6 @@ class AudioProvider extends Component {
     this.setState({ positionMillis: newPosition });
   };
 
-  // PlayNext = async () => {
-  //   const { audioFiles, currentUri } = this.state;
-  //   const currentIndex = audioFiles.findIndex(audio => audio.url === currentUri);
-
-  //   if (currentIndex >= 0 && currentIndex < audioFiles.length - 1) {
-  //     const nextAudio = audioFiles[currentIndex + 1];
-  //     await this.playSound(nextAudio.url, nextAudio); // Pass next audio metadata
-  //   }
-  // };
-
-  // // Play previous method
-  // PlayPrevious = async () => {
-  //   const { audioFiles, currentUri } = this.state;
-  //   const currentIndex = audioFiles.findIndex(audio => audio.url === currentUri);
-
-  //   if (currentIndex > 0) {
-  //     const previousAudio = audioFiles[currentIndex - 1];
-  //     await this.playSound(previousAudio.url, previousAudio); // Pass previous audio metadata
-  //   }
-  // };
-
   seek = async (position) => {
     await this.soundRef.setPositionAsync(position);
     this.setState({ positionMillis: position });
@@ -133,7 +113,7 @@ class AudioProvider extends Component {
   };
 
   startUpdatingProgress = () => {
-    this.updateInterval = setInterval(this.updatePositionMillis, 1000); // Update position every second
+    this.updateInterval = setInterval(this.updatePositionMillis, 1000);
   };
 
   cleanupAudio = async () => {
@@ -144,6 +124,7 @@ class AudioProvider extends Component {
         currentSound: null, 
         isPlaying: false, 
         currentUri: '', 
+        currentTitle: '',
         durationMillis: 0, 
         positionMillis: 0 
       });
@@ -152,7 +133,6 @@ class AudioProvider extends Component {
 
   render() {
     return (
-      
       <AudioContext.Provider value={{
         audioFiles: this.state.audioFiles,
         playSound: this.playSound,
@@ -164,15 +144,14 @@ class AudioProvider extends Component {
         isLoading: this.state.isLoading,
         error: this.state.error,
         currentUri: this.state.currentUri,
+        currentTitle: this.state.currentTitle,
         durationMillis: this.state.durationMillis,
         positionMillis: this.state.positionMillis,
         cleanupAudio: this.cleanupAudio,
         seek: this.seek,
       }}>
         {this.props.children}
-    
       </AudioContext.Provider>
-      
     );
   }
 }
