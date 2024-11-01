@@ -19,6 +19,9 @@ class AudioProvider extends Component {
       currentTitle: '',
       durationMillis: 0,
       positionMillis: 0,
+      currentimage:'',
+      currentArtist: '',
+      currentTimestamps: [],
     };
     this.soundRef = new Audio.Sound();
     this.updateInterval = null;
@@ -30,13 +33,16 @@ class AudioProvider extends Component {
 
   playSound = async (uri) => {
     if (this.state.isLoading || !uri) return;
-
+  
     try {
-      // Find the audio file with matching URI to get its title
+      // Find the audio file with matching URI to get its title and artwork
       const audioFile = this.state.audioFiles.find(file => file.url === uri);
       const title = audioFile?.title || 'Now Playing';
+      const artist = audioFile?.artist || 'Unknown Artist';
+      const timestamps = audioFile?.timestamps || [];
+      const image = audioFile?.artwork;
 
-      // If the same sound is requested, just play it
+
       if (this.state.currentUri === uri) {
         if (this.state.isPlaying) {
           return; // Already playing, so do nothing
@@ -46,32 +52,29 @@ class AudioProvider extends Component {
         this.startUpdatingProgress();
         return;
       }
-
-      // Clean up the previous sound if a different sound is requested
+  
       await this.cleanupAudio();
       this.setState({ isLoading: true });
-
-      // Load the new sound
+  
       await this.soundRef.loadAsync({ uri }, { shouldPlay: false });
-
-      // Set the position if resuming from a pause
       if (!this.state.isPlaying) {
         await this.soundRef.setPositionAsync(this.state.positionMillis);
       }
-
-      // Play the sound
+  
       await this.soundRef.playAsync();
-
-      // Update the state
+  
       this.setState({
         currentSound: uri,
         isPlaying: true,
         isLoading: false,
         currentUri: uri,
         currentTitle: title,
+        currentimage: image,  // Set the artwork URL
+        currentArtist: artist,
+        currentTimestamps: timestamps,
         durationMillis: (await this.soundRef.getStatusAsync()).durationMillis,
       });
-
+  
       this.startUpdatingProgress();
     } catch (error) {
       console.error("Error playing sound:", error);
@@ -125,8 +128,11 @@ class AudioProvider extends Component {
         isPlaying: false, 
         currentUri: '', 
         currentTitle: '',
+        currentimage:'',
         durationMillis: 0, 
-        positionMillis: 0 
+        positionMillis: 0 ,
+        currentArtist: '',
+        currentTimestamps: [],
       });
     }
   };
@@ -149,6 +155,9 @@ class AudioProvider extends Component {
         positionMillis: this.state.positionMillis,
         cleanupAudio: this.cleanupAudio,
         seek: this.seek,
+        currentimage:this.state.currentimage,
+        currentArtist: this.state.currentArtist,
+        currentTimestamps: this.state.currentTimestamps,
       }}>
         {this.props.children}
       </AudioContext.Provider>

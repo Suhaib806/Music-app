@@ -1,11 +1,10 @@
-// PlaybackBar.js
 import React, { useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet,Image } from "react-native";
 import { AudioContext } from "../context/AudioProvider";
 import { MaterialIcons, FontAwesome, AntDesign } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 
-const PlaybackBar = () => {
+const PlaybackBar = ({ navigation }) => {
   const {
     currentUri,
     isPlaying,
@@ -17,6 +16,9 @@ const PlaybackBar = () => {
     durationMillis,
     seek,
     currentTitle,
+    currentimage,
+    currentArtist,
+    currentTimestamps,
   } = useContext(AudioContext);
 
   const handlePlayPause = () => {
@@ -27,6 +29,16 @@ const PlaybackBar = () => {
     }
   };
 
+  const handleNavigateToDetail = () => {
+    if (currentUri) {
+      navigation.current.navigate("AudioDetails", {
+        item: { title: currentTitle, url: currentUri, artwork: currentimage, artist: currentArtist, timestamps: currentTimestamps },
+      });
+    }
+  };
+
+
+
   const formatTime = (milliseconds) => {
     const minutes = Math.floor(milliseconds / 60000);
     const seconds = Math.floor((milliseconds % 60000) / 1000);
@@ -35,12 +47,15 @@ const PlaybackBar = () => {
 
   return currentUri ? (
     <View style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText} numberOfLines={1}>
-          {currentTitle || "Now Playing"}
-        </Text>
-      </View>
-      
+      <TouchableOpacity onPress={handleNavigateToDetail}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText} numberOfLines={1}>
+            {currentTitle || "Now Playing"}
+          </Text>
+          
+        </View>
+      </TouchableOpacity>
+
       <View style={styles.controlsContainer}>
         <TouchableOpacity onPress={backward} disabled={!isPlaying}>
           <FontAwesome name="backward" size={24} color="white" />
@@ -70,7 +85,6 @@ const PlaybackBar = () => {
           minimumTrackTintColor="#fff"
           maximumTrackTintColor="#ccc"
           thumbTintColor="#fff"
-
         />
         <Text style={styles.timeText}>{formatTime(durationMillis)}</Text>
       </View>
@@ -80,36 +94,34 @@ const PlaybackBar = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'column',
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-around",
     padding: 10,
-    backgroundColor: "#fff",
     borderTopWidth: 1,
     borderColor: "#ddd",
-    position: 'absolute',
+    position: "absolute",
     bottom: 49,
     left: 0,
     right: 0,
     backgroundColor: "black",
   },
   titleContainer: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 10,
     marginBottom: 5,
   },
   titleText: {
     fontSize: 14,
-    fontWeight: '500',
-    textAlign: 'center',
-    color: '#fff',
+    fontWeight: "500",
+    textAlign: "center",
+    color: "#fff",
   },
   controlsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    color: '#333',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   },
   playPauseButton: {
     marginHorizontal: 20,
@@ -119,7 +131,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     paddingLeft: 10,
-    width: '100%',
+    width: "100%",
   },
   slider: {
     flex: 1,
