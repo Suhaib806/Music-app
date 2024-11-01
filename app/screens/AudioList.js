@@ -71,7 +71,7 @@ export class AudioList extends Component {
                   <Entypo
                     name="dots-three-vertical"
                     size={18}
-                    color="white"
+                    color="#333"
                     style={styles.icon}
                   />
                 </TouchableOpacity>
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   icon: {
-    backgroundColor: "black",
+    
     borderRadius: 100,
     padding: 4,
   },
