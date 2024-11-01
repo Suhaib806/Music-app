@@ -1,20 +1,27 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import AppNavigator from "./app/navigation/AppNavigator";
+import AudioProvider from "./app/context/AudioProvider";
+import PlaybackBar from "./app/components/playbackbar";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AudioProvider>
+      <View style={styles.container}>
+        <NavigationContainer style={styles.navigator}>
+          <AppNavigator />
+        </NavigationContainer>
+        <PlaybackBar  />
+      </View>
+    </AudioProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1, // Make sure the container takes the full height of the screen
+  },
+  navigator: {
+    flex: 1, // Make the navigator take up the remaining space
   },
 });
